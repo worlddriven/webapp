@@ -1,0 +1,44 @@
+{
+  "name": "worlddriven-webapp",
+  "version": "1.0.0",
+  "description": "Web application interface for worlddriven admin",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "build": "vite build",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "fix": "prettier --write . && eslint . --fix && tsc --noEmit",
+    "check": "prettier --check . && npm run lint && tsc --noEmit"
+  },
+  "keywords": [
+    "worlddriven",
+    "react",
+    "vite",
+    "admin"
+  ],
+  "author": "Tobias Wilken",
+  "license": "AGPL",
+  "dependencies": {
+    "express": "^5.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.8.2",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.38.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.11"
+  }
+}
