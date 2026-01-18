@@ -27,7 +27,7 @@ async function startServer() {
     });
   });
 
-  // Proxy API requests to backend - MUST be before Vite middleware
+  // Proxy API requests to backend - MUST be before static/Vite middleware
   app.use('/api', proxy);
 
   // Setup Vite middleware (development only)
@@ -41,10 +41,15 @@ async function startServer() {
     app.use(vite.middlewares);
   }
 
-  // Serve static files
+  // Serve static files (landing page, images, css)
   app.use(express.static('./public'));
 
-  // Static pages (no React)
+  // In production, serve built assets from dist/
+  if (isProduction) {
+    app.use(express.static('./dist'));
+  }
+
+  // Static pages (no React) - served from public/
   app.get('/', (req, res) => {
     res.sendFile('index.html', { root: './public' });
   });
@@ -57,15 +62,17 @@ async function startServer() {
     res.sendFile('privacyPolicy.html', { root: './public' });
   });
 
-  // React pages - use Vite in development
+  // React pages - serve from dist/ in production, transform with Vite in development
   const serveReactPage = async (req, res, htmlFile) => {
     if (isProduction) {
-      res.sendFile(htmlFile, { root: './public' });
+      // Serve pre-built HTML from dist/
+      res.sendFile(htmlFile, { root: './dist' });
     } else {
+      // Transform HTML with Vite (handles JSX imports)
       try {
         const template = await vite.transformIndexHtml(
           req.originalUrl,
-          fs.readFileSync(path.join('./public', htmlFile), 'utf-8')
+          fs.readFileSync(path.join('.', htmlFile), 'utf-8')
         );
         res.setHeader('Content-Type', 'text/html');
         res.send(template);
@@ -80,7 +87,8 @@ async function startServer() {
   app.get('/dashboard', (req, res) =>
     serveReactPage(req, res, 'dashboard.html')
   );
-  app.get('/admin', (req, res) => serveReactPage(req, res, 'dashboard.html'));
+
+  app.get('/admin', (req, res) => serveReactPage(req, res, 'admin.html'));
 
   // PR pages: /:owner/:repo/pull/:number
   app.get('/:owner/:repo/pull/:number', (req, res) => {
