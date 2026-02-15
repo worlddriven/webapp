@@ -71,9 +71,18 @@ async function handleProxy(req, res) {
     }
     console.log(`[Proxy] Response status: ${response.status}`);
 
-    // Copy response headers (excluding set-cookie which we handle separately)
+    // Copy response headers, excluding:
+    // - set-cookie: handled separately for auth
+    // - content-encoding: fetch() auto-decompresses, so body is already plain
+    // - content-length: no longer accurate after decompression
+    const skipHeaders = new Set([
+      'set-cookie',
+      'content-encoding',
+      'content-length',
+      'transfer-encoding',
+    ]);
     response.headers.forEach((value, key) => {
-      if (key.toLowerCase() !== 'set-cookie') {
+      if (!skipHeaders.has(key.toLowerCase())) {
         res.setHeader(key, value);
       }
     });
