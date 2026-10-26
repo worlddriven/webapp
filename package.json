@@ -24,8 +24,8 @@
     "prop-types": "15.8.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-router-dom": "7.13.0",
-    "styled-components": "6.3.8"
+    "react-router-dom": "7.18.4",
+    "styled-components": "6.6.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
@@ -41,5 +41,8 @@
     "prettier": "3.8.1",
     "typescript": "5.9.3",
     "vite": "7.3.1"
+  },
+  "engines": {
+    "node": "26.x"
   }
 }
