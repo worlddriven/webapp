@@ -69,7 +69,7 @@
         <div class="login">
           <p>
             Login with
-            <a id="login-link" href="/api/login">
+            <a href="/login">
               <img
                 src="/images/GitHub-Mark-120px-plus.png"
                 alt="GitHub logo linked to login"
@@ -77,13 +77,6 @@
             /></a>
           </p>
         </div>
-        <script>
-          // Set callback URL for multi-domain OAuth
-          const loginLink = document.getElementById('login-link');
-          const callbackUrl = window.location.origin + '/api/github-callback';
-          const redirectUrl = '/dashboard';
-          loginLink.href = `/api/login?callback=${encodeURIComponent(callbackUrl)}&redirect=${encodeURIComponent(redirectUrl)}`;
-        </script>
         <div class="logo">
           <a href="/">
             <img src="/images/logo_world_driven.svg" alt="World driven logo"

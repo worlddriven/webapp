@@ -68,7 +68,7 @@ Create a `.env` file in the root directory:
 
 ```env
 # Backend API URL
-BACKEND_URL=http://localhost:8080
+API_URL=http://localhost:8080
 
 # Server port (default: 3000)
 PORT=3000
@@ -130,7 +130,7 @@ webapp/
 
 The proxy server (`server/proxy.js`) converts httpOnly cookies to Authorization headers:
 
-1. **Login Request**: User authenticates via `/api/auth/login`
+1. **Login Request**: `/login` starts GitHub OAuth, which returns to `/github-callback`
    - Backend returns `sessionId` in response body
    - Proxy extracts `sessionId` and sets it as httpOnly cookie
    - Removes `sessionId` from response to prevent JavaScript access
@@ -140,8 +140,16 @@ The proxy server (`server/proxy.js`) converts httpOnly cookies to Authorization 
    - Converts to `Authorization: SESSION <sessionId>` header
    - Forwards request to backend with authorization
 
-3. **Logout Request**: User logs out via `/api/auth/logout`
+3. **Logout Request**: User logs out via `/api/user/logout`
    - Proxy clears the httpOnly cookie
+
+### Routes Outside `/api`
+
+These are forwarded to the backend with their full path, so the webapp can serve the public domain:
+
+- `POST /github`, `POST /api/webhooks/migrate`: GitHub webhooks, including the `x-github-*` and `x-hub-signature*` headers
+- `GET /github-callback`: the OAuth callback
+- `GET /install-app`: redirect to the GitHub App installation
 
 ### Why httpOnly Cookies?
 
@@ -233,7 +241,7 @@ For production, ensure these environment variables are set:
 
 ```env
 NODE_ENV=production
-BACKEND_URL=https://api.worlddriven.org
+API_URL=https://core.worlddriven.org
 PORT=3000
 ```
 

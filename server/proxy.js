@@ -20,7 +20,7 @@ router.all('/{*path}', async (req, res) => {
   handleProxy(req, res);
 });
 
-async function handleProxy(req, res) {
+export async function handleProxy(req, res) {
   console.log(`[Proxy] ${req.method} ${req.url} -> ${apiURL}${req.url}`);
   try {
     // Extract sessionId from cookie and convert to Authorization header
@@ -50,6 +50,13 @@ async function handleProxy(req, res) {
         'content-type': req.headers['content-type'],
       },
     };
+
+    // Webhook handlers in core read the event type from these headers
+    for (const [name, value] of Object.entries(req.headers)) {
+      if (name.startsWith('x-github-') || name.startsWith('x-hub-signature')) {
+        options.headers[name] = value;
+      }
+    }
 
     // Add body for non-GET requests
     if (req.method !== 'GET' && req.method !== 'HEAD') {

@@ -90,6 +90,18 @@ export class Dashboard extends React.Component {
   }
 
   /**
+   * logout - Ends the session and returns to the landing page
+   *
+   * @param {object} event - The click event
+   * @return {void}
+   **/
+  async logout(event) {
+    event.preventDefault();
+    await fetch('/api/user/logout');
+    location.href = '/';
+  }
+
+  /**
    * componentDidMount - after component mount
    *
    * @return {void}
@@ -176,7 +188,7 @@ export class Dashboard extends React.Component {
       <div className={styles.content}>
         <div className="top">
           <div className="login">
-            <a href="/api/logout">
+            <a href="/api/user/logout" onClick={this.logout}>
               <span className="logintitle">Logout</span>
               <img src="/images/GitHub-Mark-120px-plus.png" width="30" />
             </a>

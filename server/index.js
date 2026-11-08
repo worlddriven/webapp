@@ -1,7 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
-import proxy from './proxy.js';
+import proxy, { handleProxy } from './proxy.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 3001;
@@ -27,8 +27,34 @@ async function startServer() {
     });
   });
 
+  // GitHub webhooks are delivered to these paths on the public domain.
+  // Forwarded with the full path, so before the /api mount strips the prefix.
+  app.post(['/github', '/api/webhooks/migrate'], handleProxy);
+
+  // Core only hands out a session for the webapp when it gets a callback
+  app.get('/api/login', (req, res, next) => {
+    if (req.query.callback) {
+      next();
+    } else {
+      res.redirect('/login');
+    }
+  });
+
   // Proxy API requests to backend - MUST be before static/Vite middleware
   app.use('/api', proxy);
+
+  // OAuth callback registered at GitHub, and the GitHub App install redirect
+  app.get('/github-callback', handleProxy);
+  app.get('/install-app', handleProxy);
+
+  // Start the OAuth flow with this host as the callback
+  app.get('/login', (req, res) => {
+    const protocol = isProduction ? 'https' : req.protocol;
+    const callback = `${protocol}://${req.get('host')}/github-callback`;
+    res.redirect(
+      `/api/login?callback=${encodeURIComponent(callback)}&redirect=%2Fdashboard`
+    );
+  });
 
   // Setup Vite middleware (development only)
   let vite;
@@ -48,6 +74,10 @@ async function startServer() {
   if (isProduction) {
     app.use(express.static('./dist'));
   }
+
+  app.get('/favicon.ico', (req, res) => {
+    res.sendFile('images/favicon.png', { root: './public' });
+  });
 
   // Static pages (no React) - served from public/
   app.get('/', (req, res) => {
